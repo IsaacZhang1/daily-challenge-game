@@ -65,6 +65,11 @@ class _LoadingPageState extends State<LoadingPage> {
       }
     }
 
+    final isFirstLoad = prefs.getBool('isFirstLoad') ?? true;
+    if (isFirstLoad) {
+      prefs.setBool('isFirstLoad', false);
+    }
+
     Future.delayed(const Duration(milliseconds: 100), () {
       Navigator.pushReplacement(
         context,
@@ -73,6 +78,7 @@ class _LoadingPageState extends State<LoadingPage> {
             playable: playable,
             currentScore: currentScore,
             highScore: highScore,
+            isFirstLoad: isFirstLoad,
           ),
         ),
       );
