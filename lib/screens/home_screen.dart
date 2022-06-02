@@ -1,8 +1,10 @@
 import 'package:daily_game_challenge/screens/tutorial_screen.dart';
+import 'package:daily_game_challenge/screens/waiting_screen.dart';
+import 'package:daily_game_challenge/screens/widgets/circle.dart';
 import 'package:daily_game_challenge/screens/widgets/daily_game.dart';
-import 'package:daily_game_challenge/utils/vertical_space.dart';
+import 'package:daily_game_challenge/screens/widgets/start_game_button.dart';
+import 'package:daily_game_challenge/utils/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool playable;
@@ -52,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Future.delayed(const Duration(milliseconds: 500), () => showTutorial());
     }
     return Scaffold(
-      backgroundColor: Colors.green.shade100,
+      backgroundColor: AppColors.backgroundColor,
       body: playable
           ? const GameCanvas()
           : WaitingScreen(
@@ -64,7 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void onNewDay() {
-    print('iz: onNewDay');
     setState(() {
       playable = true;
     });
@@ -84,85 +85,14 @@ class _GameCanvasState extends State<GameCanvas> {
   @override
   Widget build(BuildContext context) {
     return isPlaying
-        ? const DailyGame(
-            diameter: 250,
-            durationInMilliseconds: 4000,
-          )
-        : Center(
-            child: ElevatedButton(
-              child: const Text('Start Game'),
-              onPressed: () {
-                setState(() {
-                  isPlaying = true;
-                });
-              },
-            ),
+        ? const DailyGame()
+        : GestureDetector(
+            onTap: () {
+              setState(() {
+                isPlaying = true;
+              });
+            },
+            child: const StartGameButton(),
           );
-  }
-}
-
-class WaitingScreen extends StatelessWidget {
-  final int? currentScore;
-  final int? highScore;
-  final VoidCallback onNewDay;
-
-  const WaitingScreen({
-    Key? key,
-    required this.currentScore,
-    required this.highScore,
-    required this.onNewDay,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final currentDate = DateTime.now();
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        CountdownTimer(
-          endTime: DateTime(currentDate.year, currentDate.month, currentDate.day + 1).millisecondsSinceEpoch,
-          textStyle: const TextStyle(
-            fontSize: 30,
-            color: Colors.red,
-            fontWeight: FontWeight.bold,
-          ),
-          onEnd: () => onNewDay(),
-        ),
-        const VerticalSpace(byFactorOf: 4),
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          decoration: BoxDecoration(
-            color: Colors.green,
-            borderRadius: BorderRadius.circular(14.0),
-          ),
-          child: const Text(
-            'Try again tomorrow!',
-            style: TextStyle(
-              fontSize: 24,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const VerticalSpace(byFactorOf: 4),
-        Text(
-          'Today: ${currentScore.toString()}',
-          style: const TextStyle(
-            fontSize: 24,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const VerticalSpace(byFactorOf: 4),
-        Text(
-          'High score: ${highScore.toString()}',
-          style: const TextStyle(
-            fontSize: 24,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
   }
 }

@@ -1,18 +1,15 @@
-import 'package:daily_game_challenge/screens/end_game_popup.dart';
+import 'package:daily_game_challenge/screens/widgets/end_game_popup.dart';
 import 'package:daily_game_challenge/screens/widgets/circle.dart';
 import 'package:daily_game_challenge/screens/widgets/expanding_widgets.dart';
+import 'package:daily_game_challenge/utils/app_colors.dart';
+import 'package:daily_game_challenge/utils/game_config.dart';
 import 'package:daily_game_challenge/utils/vertical_space.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DailyGame extends StatefulWidget {
-  final double diameter;
-  final int durationInMilliseconds;
-
   const DailyGame({
     Key? key,
-    required this.diameter,
-    required this.durationInMilliseconds,
   }) : super(key: key);
 
   @override
@@ -26,8 +23,6 @@ class _DailyGameState extends State<DailyGame> {
   late GlobalKey<ExpandingCircleAnimationState> _myKey;
   double previousValue = 0.0;
 
-  final gameType = GameType.increasing;
-
   int score = 0;
 
   @override
@@ -37,10 +32,10 @@ class _DailyGameState extends State<DailyGame> {
     _myKey = GlobalKey();
     currentAnimation = ExpandingCircleAnimation(
       key: _myKey,
-      diameter: widget.diameter,
-      durationInMilliseconds: widget.durationInMilliseconds,
+      diameter: GameConfig.circleDiameter,
+      durationInMilliseconds: GameConfig.animationDuration,
     );
-    gameObjects.add(Circle(diameter: widget.diameter + 3));
+    gameObjects.add(Circle(diameter: GameConfig.circleDiameter + 3));
     gameObjects.add(currentAnimation);
   }
 
@@ -55,7 +50,7 @@ class _DailyGameState extends State<DailyGame> {
           Text(
             score.toString(),
             style: const TextStyle(
-              fontSize: 35.0,
+              fontSize: 45.0,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -75,20 +70,19 @@ class _DailyGameState extends State<DailyGame> {
             onTap: onUserTap,
             child: Circle(
               diameter: 115,
-              borderColor: Colors.grey,
-              borderWidth: 10.0,
-              fillColor: Colors.red,
+              borderColor: AppColors.gameButtonColorBorder,
+              borderWidth: 7.0,
               gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
                 colors: [
-                  Colors.red.shade400,
-                  Colors.red.shade900,
+                  AppColors.gameButtonColor,
+                  AppColors.gameButtonColor2,
                 ],
               ),
             ),
           ),
-          const VerticalSpace(byFactorOf: 10),
+          const VerticalSpace(byFactorOf: 8),
         ],
       ),
     );
@@ -97,14 +91,14 @@ class _DailyGameState extends State<DailyGame> {
   void onUserTap() {
     final value = _myKey.currentState!.stopGame();
     setState(() {
-      if (shouldContinue(value: value, gameType: gameType)) {
+      if (shouldContinue(value: value)) {
         score += 1;
         previousValue = value;
         _myKey = GlobalKey();
         currentAnimation = ExpandingCircleAnimation(
           key: _myKey,
-          diameter: widget.diameter,
-          durationInMilliseconds: widget.durationInMilliseconds,
+          diameter: GameConfig.circleDiameter,
+          durationInMilliseconds: GameConfig.animationDuration,
         );
         gameObjects.add(currentAnimation);
         return;
@@ -114,16 +108,8 @@ class _DailyGameState extends State<DailyGame> {
     });
   }
 
-  bool shouldContinue({
-    required double value,
-    required GameType gameType,
-  }) {
-    switch (gameType) {
-      case GameType.increasing:
-        {
-          return value > previousValue;
-        }
-    }
+  bool shouldContinue({required double value}) {
+    return value > previousValue;
   }
 
   void onEndGame() async {
@@ -152,8 +138,4 @@ class _DailyGameState extends State<DailyGame> {
     }
     return highScore;
   }
-}
-
-enum GameType {
-  increasing,
 }

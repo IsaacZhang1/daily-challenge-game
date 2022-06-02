@@ -75,7 +75,7 @@ class _LoadingPageState extends State<LoadingPage> {
         context,
         MaterialPageRoute(
           builder: (context) => HomeScreen(
-            playable: true,
+            playable: playable,
             currentScore: currentScore,
             highScore: highScore,
             isFirstLoad: isFirstLoad,
