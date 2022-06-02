@@ -52,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Future.delayed(const Duration(milliseconds: 500), () => showTutorial());
     }
     return Scaffold(
+      backgroundColor: Colors.green.shade100,
       body: playable
           ? const GameCanvas()
           : WaitingScreen(
